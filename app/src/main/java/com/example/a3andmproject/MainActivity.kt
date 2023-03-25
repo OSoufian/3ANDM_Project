@@ -16,5 +16,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intentHome);
             }
         }, 2000);
+
+        
     }
 }
