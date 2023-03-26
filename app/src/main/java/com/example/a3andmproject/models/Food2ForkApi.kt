@@ -1,5 +1,7 @@
 package com.example.a3andmproject.models
 
+import java.io.Serializable
+
 data class Food2ForkApi(
     val count: Int,
     val next: String?,
@@ -21,4 +23,4 @@ data class Recipe(
     val date_updated: String,
     val long_date_added: Long,
     val long_date_updated: Long
-)
+) : Serializable

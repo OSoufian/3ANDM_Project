@@ -1,5 +1,6 @@
 package com.example.a3andmproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ import com.example.a3andmproject.models.Food2ForkApi
 import com.example.a3andmproject.models.Recipe
 import com.example.a3andmproject.utils.Constant
 import com.google.gson.Gson
+import java.io.Serializable
 
 class HomeActivity : AppCompatActivity() {
     private val recipeListRecyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.recipeListRecyclerView) }
@@ -71,6 +73,12 @@ class HomeActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipes[position]
             holder.bind(recipe)
+            holder.itemView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, RecipeDetailsActivity::class.java).apply {
+                    putExtra(RecipeDetailsActivity.EXTRA_RECIPE, recipe as Serializable)
+                }
+                holder.itemView.context.startActivity(intent)
+            }
         }
 
         override fun getItemCount(): Int {
