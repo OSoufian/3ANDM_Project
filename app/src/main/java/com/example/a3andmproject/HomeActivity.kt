@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -26,9 +27,17 @@ import java.io.Serializable
 
 class HomeActivity : AppCompatActivity() {
     private val recipeListRecyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.recipeListRecyclerView) }
+    private val searchEditText: EditText by lazy { findViewById<EditText>(R.id.searchEditText) }
+    private val buttonSubmit: Button by lazy { findViewById<Button>(R.id.buttonSubmit) }
+    private var searchQuery = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        buttonSubmit.setOnClickListener {
+            searchQuery = searchEditText.text.toString()
+            makeRequest()
+        }
 
         makeRequest()
     }
@@ -36,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
     private fun makeRequest() {
 
         val queue = Volley.newRequestQueue(this)
-        val url = Constant.URL
+        val url = Constant.URL + searchQuery
 
         val getRequest = object : StringRequest(
             Method.GET, url,
