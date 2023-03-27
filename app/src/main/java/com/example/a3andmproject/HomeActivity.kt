@@ -72,6 +72,7 @@ class HomeActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipes[position]
+            recipe.title = recipe.title.replace("&nbsp;", " ").replace("S&#8217;", " ")
             holder.bind(recipe)
             holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, RecipeDetailsActivity::class.java).apply {
