@@ -30,22 +30,52 @@ class HomeActivity : AppCompatActivity() {
     private val searchEditText: EditText by lazy { findViewById<EditText>(R.id.searchEditText) }
     private val buttonSubmit: Button by lazy { findViewById<Button>(R.id.buttonSubmit) }
     private var searchQuery = ""
+
+    private var currentPage = 1
+    private var isLoading = false
+
+    private var hasMorePages = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        val adapter = RecipeAdapter(mutableListOf())
+        recipeListRecyclerView.adapter = adapter
+
+        recipeListRecyclerView.layoutManager = LinearLayoutManager(this)
+
         buttonSubmit.setOnClickListener {
             searchQuery = searchEditText.text.toString()
+            currentPage = 1
             makeRequest()
         }
+
+        recipeListRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+
+                if (!isLoading && hasMorePages && totalItemCount <= (lastVisibleItemPosition + 1)) {
+                    loadNextPage()
+                }
+            }
+        })
 
         makeRequest()
     }
 
-    private fun makeRequest() {
+    private fun loadNextPage() {
+        currentPage++
+        makeRequest()
+    }
 
+    private fun makeRequest() {
         val queue = Volley.newRequestQueue(this)
-        val url = Constant.URL + searchQuery
+        val url = String.format(Constant.URL, currentPage, searchQuery)
 
         val getRequest = object : StringRequest(
             Method.GET, url,
@@ -54,13 +84,21 @@ class HomeActivity : AppCompatActivity() {
                 val api = Gson().fromJson(json, Food2ForkApi::class.java)
                 Log.d("api", api.results.toString())
 
-                recipeListRecyclerView.layoutManager = LinearLayoutManager(this)
-                val adapter = RecipeAdapter(api.results)
-                recipeListRecyclerView.adapter = adapter
+                val adapter = recipeListRecyclerView.adapter as RecipeAdapter
+                if (currentPage == 1) {
+                    adapter.setData(api.results)
+                } else {
+                    adapter.addItems(api.results)
+                }
+
+                isLoading = false
+
+                hasMorePages = api.results.isNotEmpty()
             },
             Response.ErrorListener { error ->
                 Log.e("Error","error => " + error.toString())
             }
+
         ){
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
@@ -71,7 +109,7 @@ class HomeActivity : AppCompatActivity() {
         }
         queue.add(getRequest)
     }
-    inner class RecipeAdapter(private val recipes: List<Recipe>) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
+    inner class RecipeAdapter(private val recipes: MutableList<Recipe>) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
             val view =
@@ -93,6 +131,18 @@ class HomeActivity : AppCompatActivity() {
 
         override fun getItemCount(): Int {
             return recipes.size
+        }
+
+        fun setData(newRecipes: List<Recipe>) {
+            recipes.clear()
+            recipes.addAll(newRecipes)
+            notifyDataSetChanged()
+        }
+
+        fun addItems(newRecipes: List<Recipe>) {
+            val oldSize = recipes.size
+            recipes.addAll(newRecipes)
+            notifyItemRangeInserted(oldSize, newRecipes.size)
         }
 
         inner class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
