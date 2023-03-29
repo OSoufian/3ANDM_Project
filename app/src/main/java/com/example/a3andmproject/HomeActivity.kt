@@ -59,7 +59,7 @@ class HomeActivity : AppCompatActivity() {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
                 val totalItemCount = layoutManager.itemCount
 
-                if (!isLoading && hasMorePages && totalItemCount <= (lastVisibleItemPosition + 1)) {
+                if (!isLoading && hasMorePages && (lastVisibleItemPosition + 1) >= totalItemCount) {
                     loadNextPage()
                 }
             }
@@ -76,6 +76,7 @@ class HomeActivity : AppCompatActivity() {
     private fun makeRequest() {
         val queue = Volley.newRequestQueue(this)
         val url = String.format(Constant.URL, currentPage, searchQuery)
+        val loadingImageView = findViewById<ImageView>(R.id.loadingImageView)
 
         val getRequest = object : StringRequest(
             Method.GET, url,
@@ -92,11 +93,13 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 isLoading = false
+                loadingImageView.visibility = View.GONE
 
                 hasMorePages = api.results.isNotEmpty()
             },
             Response.ErrorListener { error ->
                 Log.e("Error","error => " + error.toString())
+                loadingImageView.visibility = View.GONE
             }
 
         ){
@@ -107,6 +110,8 @@ class HomeActivity : AppCompatActivity() {
                 return params
             }
         }
+
+        loadingImageView.visibility = View.VISIBLE
         queue.add(getRequest)
     }
     inner class RecipeAdapter(private val recipes: MutableList<Recipe>) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
