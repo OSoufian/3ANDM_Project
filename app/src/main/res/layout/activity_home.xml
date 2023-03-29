@@ -17,6 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- TODO : Designer la Search Bar -->
         <EditText
             android:id="@+id/searchEditText"
             android:layout_width="0dp"
@@ -28,31 +29,70 @@
             android:padding="5dp" />
 
         <Button
-            android:id="@+id/buttonSubmit"
+            android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="@string/submitText" />
+            android:text="@string/submit" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/categoryLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/searchLinearLayout"
+        android:paddingBottom="2dp"
+        android:weightSum="4">
+
+        <!-- TODO : Augmenter padding sur les côtés -->
+
+        <Button
+            android:id="@+id/chickenButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="@string/chicken"
+            android:padding="0dp" />
+
+        <Button
+            android:id="@+id/beefButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="@string/beef"
+            android:padding="0dp" />
+
+        <Button
+            android:id="@+id/soupButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="@string/soup"
+            android:padding="0dp" />
+
+        <Button
+            android:id="@+id/frenchButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="@string/french"
+            android:padding="0dp" />
+
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/searchLinearLayout"
+        app:layout_constraintTop_toBottomOf="@id/categoryLinearLayout"
         android:paddingBottom="20dp">
-
-        <!-- TODO : Ajuster le width à la taille de l'écran -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recipeListRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="550dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-           />
 
         <ImageView
             android:id="@+id/loadingImageView"
@@ -61,6 +101,18 @@
             android:layout_gravity="center"
             android:visibility="visible"
             android:src="@drawable/loading"/>
+
+        <!-- TODO : Ajuster le width à la taille de l'écran -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipeListRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+           />
 
     </LinearLayout>
 

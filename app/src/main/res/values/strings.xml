@@ -1,6 +1,11 @@
 <resources>
-    <string name="app_name">3ANDM Project</string>
+    <string name="app_name">SupFood</string>
     <string name="updated">Modifié le&#160;</string>
     <string name="search">Rechercher</string>
-    <string name="submitText">OK</string>
+    <string name="submit">Ok</string>
+    <string name="chicken">Poulet</string>
+    <string name="beef">Boeuf</string>
+    <string name="soup">Soupe</string>
+    <string name="french">French</string>
+
 </resources>

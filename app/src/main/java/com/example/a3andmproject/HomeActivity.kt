@@ -28,7 +28,11 @@ import java.io.Serializable
 class HomeActivity : AppCompatActivity() {
     private val recipeListRecyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.recipeListRecyclerView) }
     private val searchEditText: EditText by lazy { findViewById<EditText>(R.id.searchEditText) }
-    private val buttonSubmit: Button by lazy { findViewById<Button>(R.id.buttonSubmit) }
+    private val submitButton: Button by lazy { findViewById<Button>(R.id.submitButton) }
+    private val chickenButton: Button by lazy { findViewById<Button>(R.id.chickenButton) }
+    private val beefButton: Button by lazy { findViewById<Button>(R.id.beefButton) }
+    private val soupButton: Button by lazy { findViewById<Button>(R.id.soupButton) }
+    private val frenchButton: Button by lazy { findViewById<Button>(R.id.frenchButton) }
     private var searchQuery = ""
 
     private var currentPage = 1
@@ -45,8 +49,32 @@ class HomeActivity : AppCompatActivity() {
 
         recipeListRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        buttonSubmit.setOnClickListener {
+        submitButton.setOnClickListener {
             searchQuery = searchEditText.text.toString()
+            currentPage = 1
+            makeRequest()
+        }
+
+        chickenButton.setOnClickListener {
+            searchQuery = "Chicken"
+            currentPage = 1
+            makeRequest()
+        }
+
+        beefButton.setOnClickListener {
+            searchQuery = "Beef"
+            currentPage = 1
+            makeRequest()
+        }
+
+        soupButton.setOnClickListener {
+            searchQuery = "Soup"
+            currentPage = 1
+            makeRequest()
+        }
+
+        frenchButton.setOnClickListener {
+            searchQuery = "French"
             currentPage = 1
             makeRequest()
         }
