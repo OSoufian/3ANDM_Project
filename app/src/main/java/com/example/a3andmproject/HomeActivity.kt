@@ -13,17 +13,20 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room.databaseBuilder
 import com.android.volley.AuthFailureError
-import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.example.a3andmproject.database.AppDatabase
 import com.example.a3andmproject.models.Food2ForkApi
 import com.example.a3andmproject.models.Recipe
 import com.example.a3andmproject.utils.Constant
+import com.example.a3andmproject.utils.Network
 import com.google.gson.Gson
 import java.io.Serializable
+
 
 class HomeActivity : AppCompatActivity() {
     private val recipeListRecyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.recipeListRecyclerView) }
@@ -37,17 +40,20 @@ class HomeActivity : AppCompatActivity() {
 
     private var currentPage = 1
     private var isLoading = false
-
     private var hasMorePages = true
+
+    val db = AppDatabase.getInstance(this).recipeDao()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
         val adapter = RecipeAdapter(mutableListOf())
         recipeListRecyclerView.adapter = adapter
 
         recipeListRecyclerView.layoutManager = LinearLayoutManager(this)
+
+
 
         submitButton.setOnClickListener {
             searchQuery = searchEditText.text.toString()
@@ -106,42 +112,76 @@ class HomeActivity : AppCompatActivity() {
         val url = String.format(Constant.URL, currentPage, searchQuery)
         val loadingImageView = findViewById<ImageView>(R.id.loadingImageView)
 
-        val getRequest = object : StringRequest(
-            Method.GET, url,
-            Response.Listener { json ->
-                Log.d("json", json)
-                val api = Gson().fromJson(json, Food2ForkApi::class.java)
-                Log.d("api", api.results.toString())
+        if (Network.isNetworkAvailable(this)) {
+            val getRequest = object : StringRequest(
+                Method.GET, url,
+                Response.Listener { json ->
+                    Log.d("json", json)
+                    val api = Gson().fromJson(json, Food2ForkApi::class.java)
+                    Log.d("api", api.results.toString())
 
-                val adapter = recipeListRecyclerView.adapter as RecipeAdapter
-                if (currentPage == 1) {
-                    adapter.setData(api.results)
-                } else {
-                    adapter.addItems(api.results)
+                    val adapter = recipeListRecyclerView.adapter as RecipeAdapter
+                    if (currentPage == 1) {
+                        adapter.setData(api.results)
+                    } else {
+                        adapter.addItems(api.results)
+                    }
+
+                    isLoading = false
+                    loadingImageView.visibility = View.GONE
+                    hasMorePages = api.results.isNotEmpty()
+
+                    // Ajout des recipes dans la database
+//                    val recipeDao = AppDatabase.getInstance(this).recipeDao()
+//                    GlobalScope.launch {
+//                        recipeDao.insertRecipes(api.results)
+//                    }
+                },
+                Response.ErrorListener { error ->
+                    Log.e("Error","error => " + error.toString())
+                    loadingImageView.visibility = View.GONE
                 }
 
-                isLoading = false
-                loadingImageView.visibility = View.GONE
-
-                hasMorePages = api.results.isNotEmpty()
-            },
-            Response.ErrorListener { error ->
-                Log.e("Error","error => " + error.toString())
-                loadingImageView.visibility = View.GONE
+            ){
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["Authorization"] = "Token 9c8b06d329136da358c2d00e76946b0111ce2c48"
+                    return params
+                }
             }
 
-        ){
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val params: MutableMap<String, String> = HashMap()
-                params["Authorization"] = "Token 9c8b06d329136da358c2d00e76946b0111ce2c48"
-                return params
+            loadingImageView.visibility = View.VISIBLE
+            queue.add(getRequest)
+        } else {
+//            val recipes = getRecipesFromDatabase()
+
+            val adapter = recipeListRecyclerView.adapter as RecipeAdapter
+            if (currentPage == 1) {
+//                adapter.setData(recipes)
+            } else {
+//                adapter.addItems(recipes)
             }
+
+            isLoading = false
+            loadingImageView.visibility = View.GONE
+
+//            hasMorePages = recipes.isNotEmpty()
         }
-
-        loadingImageView.visibility = View.VISIBLE
-        queue.add(getRequest)
     }
+
+    private fun saveDataToDatabase(recipes: List<Recipe>) {
+//        val db = AppDatabase.getInstance(applicationContext)
+
+//        db.recipeDao().deleteRecipes()
+//
+//        db.recipeDao().insertRecipes(recipes)
+    }
+
+//    private fun getRecipesFromDatabase(): List<Recipe> {
+//        val db = AppDatabase.getInstance(applicationContext)
+//        return db.recipeDao().getRecipes()
+//    }
     inner class RecipeAdapter(private val recipes: MutableList<Recipe>) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
