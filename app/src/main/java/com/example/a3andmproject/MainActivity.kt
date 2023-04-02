@@ -10,13 +10,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val timer = Timer(false).schedule(object: TimerTask(){
+        Timer(false).schedule(object: TimerTask(){
             override fun run() {
                 val intentHome = Intent(this@MainActivity, HomeActivity::class.java);
                 startActivity(intentHome);
             }
         }, 2000);
-
-        
     }
 }

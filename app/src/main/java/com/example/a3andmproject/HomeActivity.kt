@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.AuthFailureError
-import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -36,8 +35,6 @@ class HomeActivity : AppCompatActivity() {
     private var searchQuery = ""
 
     private var currentPage = 1
-    private var isLoading = false
-
     private var hasMorePages = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
                 val totalItemCount = layoutManager.itemCount
 
-                if (!isLoading && hasMorePages && (lastVisibleItemPosition + 1) >= totalItemCount) {
+                if (hasMorePages && (lastVisibleItemPosition + 1) >= totalItemCount) {
                     loadNextPage()
                 }
             }
@@ -104,7 +101,9 @@ class HomeActivity : AppCompatActivity() {
     private fun makeRequest() {
         val queue = Volley.newRequestQueue(this)
         val url = String.format(Constant.URL, currentPage, searchQuery)
+
         val loadingImageView = findViewById<ImageView>(R.id.loadingImageView)
+        loadingImageView.visibility = View.VISIBLE
 
         val getRequest = object : StringRequest(
             Method.GET, url,
@@ -120,7 +119,6 @@ class HomeActivity : AppCompatActivity() {
                     adapter.addItems(api.results)
                 }
 
-                isLoading = false
                 loadingImageView.visibility = View.GONE
 
                 hasMorePages = api.results.isNotEmpty()
@@ -139,7 +137,6 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        loadingImageView.visibility = View.VISIBLE
         queue.add(getRequest)
     }
     inner class RecipeAdapter(private val recipes: MutableList<Recipe>) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
@@ -152,7 +149,7 @@ class HomeActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipes[position]
-            recipe.title = recipe.title.replace("&nbsp;", " ").replace("S&#8217;", " ")
+            recipe.title = recipe.title.replace("&nbsp;", " ").replace("&#8217;", "'").replace("&amp;", "&") // remplace les caractères spéciaux dans les titres
             holder.bind(recipe)
             holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, RecipeDetailsActivity::class.java).apply {
@@ -179,8 +176,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
         inner class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-
             private val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
             private val recipeImageView: ImageView = itemView.findViewById(R.id.recipeImageView)
 

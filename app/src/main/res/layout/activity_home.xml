@@ -17,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- TODO : Designer la Search Bar -->
         <EditText
             android:id="@+id/searchEditText"
             android:layout_width="0dp"
@@ -44,8 +43,6 @@
         app:layout_constraintTop_toBottomOf="@id/searchLinearLayout"
         android:paddingBottom="2dp"
         android:weightSum="4">
-
-        <!-- TODO : Augmenter padding sur les côtés -->
 
         <Button
             android:id="@+id/chickenButton"
@@ -102,7 +99,6 @@
             android:visibility="visible"
             android:src="@drawable/loading"/>
 
-        <!-- TODO : Ajuster le width à la taille de l'écran -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recipeListRecyclerView"
             android:layout_width="match_parent"
